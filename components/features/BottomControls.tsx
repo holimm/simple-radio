@@ -2,9 +2,13 @@
 
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
-import RangeInput from "@/components/ui/rangeInput";
-import IconButton from "@/components/ui/iconButton";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import RangeInput from "@/components/ui/RangeInput";
+import IconButton from "@/components/ui/IconButton";
+import NatureSoundControls from "@/components/ui/NatureSoundControls";
+import Container from "@/components/layout/Container";
+import Flex from "@/components/layout/Flex";
+import Grid from "@/components/layout/Grid";
 
 registerGSAP();
 
@@ -18,13 +22,6 @@ type BottomControlsProps = {
   play: boolean;
   mute: boolean;
   backgroundLabel: string;
-  screenWidth: number;
-};
-
-type NatureSoundControlsProps = {
-  src: string;
-  alt: string;
-  handleVolume: (e: React.ChangeEvent<HTMLInputElement>) => void;
   screenWidth: number;
 };
 
@@ -81,61 +78,55 @@ export const BottomControls = ({
     { scope: rootRef }
   );
 
-  const renderNatureSoundControls = ({
-    src,
-    alt,
-    handleVolume,
-    screenWidth: width,
-  }: NatureSoundControlsProps) => {
-    return (
-      <div
-        className={`h-fit w-fit float-left mx-3 ${
-          width < 1280 && "flex justify-center items-center"
-        }`}
-      >
-        <img className={`w-8 h-8 mr-5 xl:mx-auto`} src={src} alt={alt}></img>
-        <RangeInput
-          onChange={handleVolume}
-          className="w-[2rem] md:w-[8rem]"
-        />
-      </div>
-    );
-  };
   return (
-    <div
+    <Grid
       ref={rootRef}
-      className="w-full h-fit mx-auto grid grid-cols-1 md:grid-cols-3 gap-2 lg:gap-16"
+      width="full"
+      height="fit"
+      cols={1}
+      gap={2}
+      centered
+      className="md:grid-cols-3 lg:gap-16"
     >
       {/* Nature Sound */}
-      <div className="h-full w-full hidden md:block">
-        <div
+      <Container width="full" height="full" className="hidden md:block">
+        <Flex
           ref={natureRef}
-          className="h-full w-full xl:w-[75%] flex justify-center items-center float-right bg-slate-400/30 backdrop-blur-xl rounded-full"
+          width="full"
+          height="full"
+          justify="center"
+          align="center"
+          className="xl:w-[75%] float-right bg-slate-400/30 backdrop-blur-xl rounded-full"
         >
-          <div className="mx-auto w-fit grid lg:grid-cols-1 xl:grid-cols-2 gap-6">
-            {renderNatureSoundControls({
-              src: "/image/icon/rain.svg",
-              alt: "RainIcon",
-              handleVolume: handleRainVolume,
-              screenWidth,
-            })}
-            {renderNatureSoundControls({
-              src: "/image/icon/wave.svg",
-              alt: "WaveIcon",
-              handleVolume: handleWaveVolume,
-              screenWidth,
-            })}
-          </div>
-        </div>
-      </div>
+          <Grid width="fit" gap={6} centered className="lg:grid-cols-1 xl:grid-cols-2">
+            <NatureSoundControls
+              src="/image/icon/rain.svg"
+              alt="RainIcon"
+              handleVolume={handleRainVolume}
+              screenWidth={screenWidth}
+            />
+            <NatureSoundControls
+              src="/image/icon/wave.svg"
+              alt="WaveIcon"
+              handleVolume={handleWaveVolume}
+              screenWidth={screenWidth}
+            />
+          </Grid>
+        </Flex>
+      </Container>
       {/* Nature Sound */}
       {/* Controls */}
-      <div className="h-full w-full">
-        <div
+      <Container width="full" height="full">
+        <Flex
           ref={controlsRef}
-          className="h-full w-full md:w-full xl:w-[80%] flex justify-center items-center px-5 py-3 mx-auto bg-slate-400/30 backdrop-blur-xl rounded-full"
+          width="full"
+          height="full"
+          justify="center"
+          align="center"
+          centered
+          className="md:w-full xl:w-[80%] px-5 py-3 bg-slate-400/30 backdrop-blur-xl rounded-full"
         >
-          <div className="h-full w-full flex justify-center items-center">
+          <Flex width="full" height="full" justify="center" align="center">
             <div className="transition-transform duration-200 ease-in-out hover:scale-110 active:scale-[0.8]">
               <IconButton
                 size="lg"
@@ -159,18 +150,27 @@ export const BottomControls = ({
               onChange={handleChangeVolume}
               className="w-[7rem] md:w-[5rem] lg:w-[7rem] xl:w-[8rem] ml-1 md:ml-0"
             />
-          </div>
-        </div>
-      </div>
+          </Flex>
+        </Flex>
+      </Container>
       {/* Controls */}
       {/* BG Changer */}
-      <div className="h-full w-full hidden md:block">
-        <div
+      <Container width="full" height="full" className="hidden md:block">
+        <Container
           ref={backgroundRef}
-          className="h-full w-full xl:w-[75%] lg:flex justify-between items-center bg-slate-400/30 backdrop-blur-xl rounded-full "
+          width="full"
+          height="full"
+          className="xl:w-[75%] lg:flex justify-between items-center bg-slate-400/30 backdrop-blur-xl rounded-full "
         >
-          <div className="flex justify-center items-center py-4 mx-auto w-fit h-full text-white after:bg-rose-500 appearance-none focus:ring-0 cursor-pointer">
-            <div className="w-fit">
+          <Flex
+            width="fit"
+            height="full"
+            justify="center"
+            align="center"
+            centered
+            className="py-4 text-white after:bg-rose-500 appearance-none focus:ring-0 cursor-pointer"
+          >
+            <Container width="fit">
               <p
                 className="text-center text-white text-2xl"
                 style={{ fontFamily: "Barlow Condensed" }}
@@ -178,11 +178,11 @@ export const BottomControls = ({
                 {backgroundLabel}
               </p>
               <RangeInput onChange={handleBackgroundChange} max={4} />
-            </div>
-          </div>
-        </div>
-      </div>
+            </Container>
+          </Flex>
+        </Container>
+      </Container>
       {/* BG Changer */}
-    </div>
+    </Grid>
   );
 };

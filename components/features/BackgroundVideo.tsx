@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import ReactPlayer from "react-player";
+import Container from "@/components/layout/Container";
 
 type BackgroundVideoProps = {
   height: string;
@@ -24,9 +25,14 @@ export const BackgroundVideo = ({
   }, [backgroundURL]);
 
   return (
-    <div
+    <Container
       ref={refBackground}
-      className="h-full w-full overflow-hidden absolute top-0 z-10 scale-150 hidden"
+      width="full"
+      height="full"
+      overflow="hidden"
+      position="absolute"
+      display="hidden"
+      className="top-0 z-10 scale-150"
     >
       <ReactPlayer
         className="react-player"
@@ -42,6 +48,6 @@ export const BackgroundVideo = ({
         loop={true}
         muted={true}
       />
-    </div>
+    </Container>
   );
 };

@@ -3,8 +3,10 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
-import IconButton from "@/components/ui/iconButton";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import IconButton from "@/components/ui/IconButton";
+import Container from "@/components/layout/Container";
+import Flex from "@/components/layout/Flex";
 
 registerGSAP();
 
@@ -31,11 +33,20 @@ const TopNavigation = ({ ...others }) => {
   );
 
   return (
-    <div
+    <Flex
       ref={navRef}
-      className="h-20 w-full flex justify-start items-center opacity-0"
+      width="full"
+      justify="start"
+      align="center"
+      className="h-20 opacity-0"
     >
-      <div className="w-full md:w-[40%] lg:w-1/3 h-full flex justify-start items-center">
+      <Flex
+        width="full"
+        height="full"
+        justify="start"
+        align="center"
+        className="md:w-[40%] lg:w-1/3"
+      >
         <Link href="/">
           <IconButton
             src="/image/icon/back.svg"
@@ -60,9 +71,13 @@ const TopNavigation = ({ ...others }) => {
             className="mx-5 text-lg"
           />
         </a>
-      </div>
-      <div className="w-6/12 lg:w-7/12 h-full hidden md:block">
-        <div className="flex justify-start items-center">
+      </Flex>
+      <Container
+        width="6/12"
+        height="full"
+        className="lg:w-7/12 hidden md:block"
+      >
+        <Flex justify="start" align="center">
           <p
             className="text-white text-2xl lg:text-6xl truncate py-2"
             style={{ fontFamily: "Barlow Condensed" }}
@@ -76,9 +91,9 @@ const TopNavigation = ({ ...others }) => {
               alt="YoutubeIcon"
             ></img>
           </a>
-        </div>
-      </div>
-    </div>
+        </Flex>
+      </Container>
+    </Flex>
   );
 };
 

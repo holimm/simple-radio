@@ -1,13 +1,10 @@
 "use client";
 
-import { useCallback } from "react";
-import Particles, { ParticlesProvider } from "@tsparticles/react";
-import type { Engine } from "@tsparticles/engine";
-import { loadSlim } from "@tsparticles/slim";
+import TsParticles from "@tsparticles/react";
 
-function ParticleCanvas() {
+const ParticleCanvas = () => {
   return (
-    <Particles
+    <TsParticles
       id="tsparticles"
       options={{
         fpsLimit: 60,
@@ -45,16 +42,6 @@ function ParticleCanvas() {
       }}
     />
   );
-}
+};
 
-export default function Particle() {
-  const init = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
-  }, []);
-
-  return (
-    <ParticlesProvider init={init}>
-      <ParticleCanvas />
-    </ParticlesProvider>
-  );
-}
+export default ParticleCanvas;

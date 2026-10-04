@@ -2,7 +2,9 @@
 
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import Container from "@/components/layout/Container";
+import Flex from "@/components/layout/Flex";
 
 registerGSAP();
 
@@ -29,12 +31,14 @@ const PausedScreen = () => {
   );
 
   return (
-    <div
+    <Container
       ref={screenRef}
-      className="w-4/12 lg:w-6/12 h-full float-left hidden md:block opacity-0"
+      width="4/12"
+      height="full"
+      className="lg:w-6/12 float-left hidden md:block opacity-0"
     >
-      <div className="h-full w-full flex justify-center items-center">
-        <div className="w-fit h-fit mx-auto">
+      <Flex width="full" height="full" justify="center" align="center">
+        <Container width="fit" height="fit" centered>
           <img
             src="/image/icon/pauseGIF.gif"
             alt="PausedGIF"
@@ -46,9 +50,9 @@ const PausedScreen = () => {
           >
             Paused
           </p>
-        </div>
-      </div>
-    </div>
+        </Container>
+      </Flex>
+    </Container>
   );
 };
 

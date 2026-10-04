@@ -2,17 +2,19 @@
 
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
-import Particle from "@/particles/particles";
-import VideoPlayer from "@/components/features/videoPlayer";
-import TopNavigation from "@/components/features/topNav";
-import ChannelPicker from "@/components/features/channelPicker";
-import PausedScreen from "@/components/features/pausedScreen";
-import NatureSound from "@/components/features/natureSound";
-import { BackgroundVideo } from "@/components/features/backgroundVideo";
-import { BottomControls } from "@/components/features/bottomControls";
-import IconRangeControl from "@/components/ui/iconRangeControl";
-import { BackgroundPlayerModel, ChannelModel } from "@/models/mainModel";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import Particles from "@/components/ui/Particles";
+import VideoPlayer from "@/components/features/VideoPlayer";
+import TopNavigation from "@/components/features/TopNav";
+import ChannelPicker from "@/components/features/ChannelPicker";
+import PausedScreen from "@/components/features/PausedScreen";
+import NatureSound from "@/components/features/NatureSound";
+import { BackgroundVideo } from "@/components/features/BackgroundVideo";
+import { BottomControls } from "@/components/features/BottomControls";
+import IconRangeControl from "@/components/ui/IconRangeControl";
+import Container from "@/components/layout/Container";
+import Section from "@/components/layout/Section";
+import { BackgroundPlayerModel, ChannelModel } from "@/models/MainModel";
 import useWindowDimensions from "@/hooks/useDimensions";
 
 registerGSAP();
@@ -35,7 +37,7 @@ export default function MusicStreamer() {
     label: "BG Video",
     url: "",
   });
-  const [particles] = useState(<Particle />);
+  const [particles] = useState(<Particles />);
   const [channel, setChannel] = useState<ChannelModel>({
     channel: "Lofi Girl - Relax/Study",
     urlPart: "jfKfPfyJRdk",
@@ -169,7 +171,7 @@ export default function MusicStreamer() {
   }
 
   return (
-    <div ref={rootRef}>
+    <Container ref={rootRef}>
       <div
         ref={curtainRef}
         className="h-screen w-screen bg-black absolute z-50"
@@ -189,7 +191,13 @@ export default function MusicStreamer() {
         play={playWave}
         url="nZfnoaHqFZw"
       />
-      <div className="h-full w-full overflow-hidden absolute top-0 z-10 md:scale-[1.8] scale-[1.4]">
+      <Container
+        width="full"
+        height="full"
+        overflow="hidden"
+        position="absolute"
+        className="top-0 z-10 md:scale-[1.8] scale-[1.4]"
+      >
         <VideoPlayer
           className={"react-player"}
           height={width < 768 ? "50vh" : "100vh"}
@@ -199,7 +207,7 @@ export default function MusicStreamer() {
           muted={mute}
           urlPart={channel.urlPart}
         />
-      </div>
+      </Container>
 
       <BackgroundVideo
         height={width < 768 ? "50vh" : "100vh"}
@@ -215,22 +223,46 @@ export default function MusicStreamer() {
       ></div>
 
       {!play && (
-        <div ref={particlesWrapRef} className="absolute top-0 z-30 opacity-0">
+        <Container
+          ref={particlesWrapRef}
+          position="absolute"
+          className="top-0 z-30 opacity-0"
+        >
           {particles}
-        </div>
+        </Container>
       )}
-      <div className="h-screen w-screen bg-transparent overflow-hidden absolute top-0 z-30">
+      <Container
+        width="screen"
+        height="screen"
+        overflow="hidden"
+        position="absolute"
+        className="bg-transparent top-0 z-30"
+      >
         <TopNavigation channel={channel.channel} url={channel.url} />
-        <div className="h-[27vh] w-full block md:hidden"></div>
-        <div className="h-[29vh] w-full md:h-[70%]">
+        <Section
+          width="full"
+          display="block"
+          className="h-[27vh] md:hidden"
+        />
+        <Section width="full" className="h-[29vh] md:h-[70%]">
           <ChannelPicker
             genre={genre}
             handleGenreChange={handleGenreChange}
             changeChannel={changeChannel}
           />
           {!play && <PausedScreen />}
-          <div ref={rightColumnRef} className="w-3/12 h-full float-right">
-            <div className="w-full h-full md:flex justify-end items-center relative">
+          <Container
+            ref={rightColumnRef}
+            width="3/12"
+            height="full"
+            className="float-right"
+          >
+            <Container
+              width="full"
+              height="full"
+              position="relative"
+              className="md:flex justify-end items-center"
+            >
               <IconRangeControl
                 onChange={handleBrightness}
                 icon="/image/icon/brightness.svg"
@@ -251,10 +283,10 @@ export default function MusicStreamer() {
                 onChange={handleBackgroundChange}
                 icon="/image/icon/image.svg"
               />
-            </div>
-          </div>
-        </div>
-        <div className="w-full h-full p-5 pb-10 mt-8 md:mt-0">
+            </Container>
+          </Container>
+        </Section>
+        <Section width="full" height="full" className="p-5 pb-10 mt-8 md:mt-0">
           <BottomControls
             handleChangeVolume={handleChangeVolume}
             handleRainVolume={handleRainVolume}
@@ -267,8 +299,8 @@ export default function MusicStreamer() {
             backgroundLabel={bgPlayer.label}
             screenWidth={width}
           />
-        </div>
-      </div>
-    </div>
+        </Section>
+      </Container>
+    </Container>
   );
 }
