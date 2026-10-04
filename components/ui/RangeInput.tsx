@@ -3,30 +3,39 @@
 type RangeInputProps = {
   min?: number;
   max?: number;
-  defaultValue?: number;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
+  step?: number;
+  value: number;
+  valueText: string;
+  label?: string;
+  labelledBy?: string;
+  onChange: (value: number) => void;
 };
 
 const RangeInput = ({
   min = 0,
   max = 100,
-  defaultValue = 0,
+  step = 1,
+  value,
+  valueText,
+  label,
+  labelledBy,
   onChange,
-  className,
 }: RangeInputProps) => {
   return (
     <input
       type="range"
-      onChange={onChange}
-      className={
-        className
-          ? `appearance-none rounded-xl p-0 h-1 bg-slate-100 ${className}`
-          : "appearance-none rounded-xl p-0 h-1 bg-slate-100"
-      }
+      className="range-input"
       min={min}
       max={max}
-      defaultValue={defaultValue}
+      step={step}
+      value={value}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value}
+      aria-valuetext={valueText}
+      onChange={(event) => onChange(Number(event.target.value))}
     />
   );
 };

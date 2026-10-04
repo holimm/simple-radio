@@ -11,13 +11,8 @@ type IconButtonProps = {
 };
 
 const buttonClassName: Record<IconButtonSize, string> = {
-  sm: "h-9 w-9 bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full",
-  lg: "h-16 w-16 lg:h-20 lg:w-20 text-lg bg-transparent border-2 transition duration-300 ease-in-out text-white rounded-full",
-};
-
-const iconClassName: Record<IconButtonSize, string> = {
-  sm: "h-6 w-6 mx-auto",
-  lg: "h-12 w-12 mx-auto",
+  sm: "player-icon-button",
+  lg: "player-icon-button player-icon-button-lg",
 };
 
 const IconButton = ({
@@ -29,12 +24,12 @@ const IconButton = ({
 }: IconButtonProps) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={
-        className ? `${buttonClassName[size]} ${className}` : buttonClassName[size]
-      }
+      aria-label={alt}
+      className={className ? `${buttonClassName[size]} ${className}` : buttonClassName[size]}
     >
-      <img className={iconClassName[size]} src={src} alt={alt} />
+      <img src={src} alt="" />
     </button>
   );
 };

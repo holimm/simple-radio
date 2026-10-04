@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import ReactPlayer from "react-player";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/Gsap";
+import {
+  consumePageTransition,
+  markPageTransition,
+} from "@/lib/pageTransition";
 import NatureSound from "@/components/features/NatureSound";
 import Container from "@/components/layout/Container";
 import Flex from "@/components/layout/Flex";
@@ -18,113 +21,192 @@ export default function Home() {
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const leavingRef = useRef(false);
   const [mute, setMute] = useState<boolean>(true);
   const [volume, setVolume] = useState<number>(0.5);
-  const [tabTransition, setTabTransition] = useState<boolean>(false);
+  const [leaving, setLeaving] = useState(false);
+  const [fromPlayer, setFromPlayer] = useState<boolean | null>(null);
+
+  useLayoutEffect(() => {
+    const handoff = consumePageTransition("home");
+    setFromPlayer(handoff);
+    if (handoff) {
+      gsap.set(veilRef.current, { autoAlpha: 1 });
+      gsap.set(contentRef.current, { opacity: 1 });
+      gsap.set([titleRef.current, ctaRef.current], { opacity: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    router.prefetch("/MusicStreamer");
+  }, [router]);
 
   const unMute = () => {
     if (mute) {
       setMute(false);
-    } else {
-      setMute(true);
-      setVolume(0);
+      if (volume === 0) setVolume(0.5);
+      return;
     }
+    setMute(true);
   };
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = mute;
+    video.volume = volume;
+    void video.play().catch(() => {});
+  }, [mute, volume]);
+
   const openHomepageTab = () => {
-    setTabTransition(true);
+    if (leavingRef.current) return;
+    leavingRef.current = true;
+    setLeaving(true);
   };
 
   useGSAP(
     () => {
+      if (fromPlayer === null) return;
+
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(veilRef.current, { autoAlpha: 0 });
         gsap.set([contentRef.current, titleRef.current, ctaRef.current], {
           opacity: 1,
-          letterSpacing: "3px",
+          y: 0,
+          scale: 1,
+          filter: "none",
         });
+        gsap.set(videoRef.current, { scale: 1 });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const intro = gsap.timeline();
+        if (fromPlayer) {
+          gsap.set(veilRef.current, { autoAlpha: 1 });
+          gsap.set(contentRef.current, { opacity: 1 });
+          gsap.set([titleRef.current, ctaRef.current], {
+            opacity: 0,
+            y: 20,
+            filter: "blur(8px)",
+          });
+          gsap.set(videoRef.current, { scale: 1.04 });
+
+          const reveal = gsap.timeline({ defaults: { ease: "power2.out" } });
+          reveal.to(veilRef.current, { autoAlpha: 0, duration: 0.7 }, 0);
+          reveal.to(videoRef.current, { scale: 1, duration: 1.2 }, 0);
+          reveal.to(
+            titleRef.current,
+            { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8 },
+            0.2
+          );
+          reveal.to(
+            ctaRef.current,
+            { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 },
+            0.35
+          );
+          return;
+        }
+
+        gsap.set(veilRef.current, { autoAlpha: 0 });
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        intro.fromTo(
+          videoRef.current,
+          { scale: 1.12 },
+          { scale: 1, duration: 2.4, ease: "power2.out" },
+          0
+        );
         intro.fromTo(
           contentRef.current,
           { opacity: 0 },
-          { opacity: 1, duration: 2, ease: "none" },
-          0
+          { opacity: 1, duration: 0.6 },
+          0.15
         );
         intro.fromTo(
           titleRef.current,
-          { opacity: 0, letterSpacing: "13px" },
-          { opacity: 1, letterSpacing: "3px", duration: 4, ease: "none" },
-          0
+          { opacity: 0, y: 36, filter: "blur(12px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.1 },
+          0.25
         );
         intro.fromTo(
           ctaRef.current,
-          { opacity: 0 },
-          { opacity: 1, duration: 5, ease: "none" },
-          0
+          { opacity: 0, y: 28, scale: 0.92 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.85 },
+          0.7
         );
       });
     },
-    { scope: containerRef }
+    { dependencies: [fromPlayer], scope: containerRef }
   );
 
   useGSAP(
     () => {
-      if (!tabTransition || !overlayRef.current) return;
+      if (!leaving || !veilRef.current) return;
 
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(overlayRef.current, { y: 0 });
+        markPageTransition("player");
+        gsap.set(veilRef.current, { autoAlpha: 1 });
         router.push("/MusicStreamer");
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.fromTo(
-          overlayRef.current,
-          { y: "-100vh" },
+        markPageTransition("player");
+        router.prefetch("/MusicStreamer");
+
+        const leave = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          onComplete: () => {
+            router.push("/MusicStreamer");
+          },
+        });
+
+        leave.to(
+          [titleRef.current, ctaRef.current],
           {
-            y: 0,
-            duration: 1,
-            ease: "power1.inOut",
-            onComplete: () => {
-              gsap.delayedCall(0.2, () => router.push("/MusicStreamer"));
-            },
-          }
+            opacity: 0,
+            y: -18,
+            filter: "blur(10px)",
+            duration: 0.45,
+            stagger: 0.05,
+            ease: "power2.in",
+          },
+          0
         );
+        leave.to(
+          videoRef.current,
+          { scale: 1.08, duration: 0.7, ease: "power2.in" },
+          0
+        );
+        leave.to(veilRef.current, { autoAlpha: 1, duration: 0.55 }, 0.15);
       });
     },
-    { dependencies: [tabTransition, router], scope: containerRef }
+    { dependencies: [leaving, router], scope: containerRef }
   );
 
   return (
     <Container ref={containerRef}>
-      {tabTransition && (
-        <div
-          ref={overlayRef}
-          className="h-screen w-screen bg-black absolute z-50"
-        ></div>
-      )}
+      <div ref={veilRef} className="page-transition-veil" aria-hidden="true" />
       <Container
         width="full"
         height="full"
         overflow="hidden"
         position="absolute"
-        className="top-0 scale-[6] md:scale-[2] lg:scale-150"
+        className="top-0"
       >
-        <ReactPlayer
-          className="react-player"
-          src={`https://www.youtube.com/watch?v=2fCoOx9W4NQ`}
-          width={"100%"}
-          height={"100vh"}
-          playing={true}
-          loop={true}
-          volume={volume}
+        <video
+          ref={videoRef}
+          className="h-full w-full origin-center object-cover will-change-transform"
+          src="/video/home-background.mp4"
+          autoPlay
+          loop
+          playsInline
           muted={mute}
+          preload="auto"
         />
       </Container>
       <NatureSound volume={0.4} mute={mute} play={true} url="Q48Fry14PDM" />
@@ -160,7 +242,7 @@ export default function Home() {
               <div>
                 <img
                   onClick={unMute}
-                  className="w-10 h-10 lg:w-16 lg:h-16 ml-5 cursor-pointer active:scale-[1.6] transition-transform duration-200 ease-in-out"
+                  className="w-10 h-10 lg:w-16 lg:h-16 ml-5 cursor-pointer hover:scale-110 active:scale-[1.6] transition-transform duration-200 ease-in-out"
                   src="/image/headphone.svg"
                   alt="HeadphoneIcon"
                 ></img>
