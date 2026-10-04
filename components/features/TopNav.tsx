@@ -3,7 +3,10 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import IconButton from "@/components/ui/IconButton";
+import Container from "@/components/layout/Container";
+import Flex from "@/components/layout/Flex";
 
 registerGSAP();
 
@@ -30,19 +33,26 @@ const TopNavigation = ({ ...others }) => {
   );
 
   return (
-    <div
+    <Flex
       ref={navRef}
-      className="h-20 w-full flex justify-start items-center opacity-0"
+      width="full"
+      justify="start"
+      align="center"
+      className="h-20 opacity-0"
     >
-      <div className="w-full md:w-[40%] lg:w-1/3 h-full flex justify-start items-center">
+      <Flex
+        width="full"
+        height="full"
+        justify="start"
+        align="center"
+        className="md:w-[40%] lg:w-1/3"
+      >
         <Link href="/">
-          <button className="h-9 w-9 mx-5 ml-0 lg:ml-20 bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
-            <img
-              className="h-6 w-6 mx-auto"
-              src="/image/icon/back.svg"
-              alt="ReturnIcon"
-            />
-          </button>
+          <IconButton
+            src="/image/icon/back.svg"
+            alt="ReturnIcon"
+            className="mx-5 ml-0 lg:ml-20"
+          />
         </Link>
         <h2
           className="text-white text-xl lg:text-3xl"
@@ -55,17 +65,19 @@ const TopNavigation = ({ ...others }) => {
           target={"_blank"}
           rel="noreferrer"
         >
-          <button className="h-9 w-9 mx-5 text-lg bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
-            <img
-              className="h-6 w-6 mx-auto"
-              src="/image/icon/github.svg"
-              alt="GitHubIcon"
-            />
-          </button>
+          <IconButton
+            src="/image/icon/github.svg"
+            alt="GitHubIcon"
+            className="mx-5 text-lg"
+          />
         </a>
-      </div>
-      <div className="w-6/12 lg:w-7/12 h-full hidden md:block">
-        <div className="flex justify-start items-center">
+      </Flex>
+      <Container
+        width="6/12"
+        height="full"
+        className="lg:w-7/12 hidden md:block"
+      >
+        <Flex justify="start" align="center">
           <p
             className="text-white text-2xl lg:text-6xl truncate py-2"
             style={{ fontFamily: "Barlow Condensed" }}
@@ -79,9 +91,9 @@ const TopNavigation = ({ ...others }) => {
               alt="YoutubeIcon"
             ></img>
           </a>
-        </div>
-      </div>
-    </div>
+        </Flex>
+      </Container>
+    </Flex>
   );
 };
 

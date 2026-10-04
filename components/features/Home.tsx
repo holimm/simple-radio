@@ -4,8 +4,11 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactPlayer from "react-player";
 import { useGSAP } from "@gsap/react";
-import { gsap, registerGSAP } from "@/lib/gsap";
-import NatureSound from "@/components/natureSound";
+import { gsap, registerGSAP } from "@/lib/Gsap";
+import NatureSound from "@/components/features/NatureSound";
+import Container from "@/components/layout/Container";
+import Flex from "@/components/layout/Flex";
+import Section from "@/components/layout/Section";
 
 registerGSAP();
 
@@ -14,7 +17,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [mute, setMute] = useState<boolean>(true);
   const [volume, setVolume] = useState<number>(0.5);
@@ -99,14 +102,20 @@ export default function Home() {
   );
 
   return (
-    <div ref={containerRef}>
+    <Container ref={containerRef}>
       {tabTransition && (
         <div
           ref={overlayRef}
           className="h-screen w-screen bg-black absolute z-50"
         ></div>
       )}
-      <div className="h-full w-full overflow-hidden absolute top-0 scale-[6] md:scale-[2] lg:scale-150">
+      <Container
+        width="full"
+        height="full"
+        overflow="hidden"
+        position="absolute"
+        className="top-0 scale-[6] md:scale-[2] lg:scale-150"
+      >
         <ReactPlayer
           className="react-player"
           src={`https://www.youtube.com/watch?v=2fCoOx9W4NQ`}
@@ -117,18 +126,30 @@ export default function Home() {
           volume={volume}
           muted={mute}
         />
-      </div>
+      </Container>
       <NatureSound volume={0.4} mute={mute} play={true} url="Q48Fry14PDM" />
       <div className="h-full w-full overflow-hidden absolute top-0 bg-black opacity-30"></div>
-      <div className="h-screen w-screen bg-transparent overflow-hidden absolute top-0">
-        <div
+      <Container
+        width="screen"
+        height="screen"
+        overflow="hidden"
+        position="absolute"
+        className="bg-transparent top-0"
+      >
+        <Flex
           ref={contentRef}
-          className="h-full w-full flex justify-center items-center opacity-0"
+          width="full"
+          height="full"
+          justify="center"
+          align="center"
+          className="opacity-0"
         >
-          <div className="h-fit w-fit">
-            <div
+          <Container width="fit" height="fit">
+            <Flex
               ref={titleRef}
-              className="flex justify-start items-center mt-5 opacity-0"
+              justify="start"
+              align="center"
+              className="mt-5 opacity-0"
             >
               <p
                 className="text-5xl lg:text-7xl text-white text-center"
@@ -144,18 +165,24 @@ export default function Home() {
                   alt="HeadphoneIcon"
                 ></img>
               </div>
-            </div>
-            <div ref={ctaRef} className="bg-transparent mx-auto mt-12 w-fit h-fit opacity-0">
+            </Flex>
+            <Section
+              ref={ctaRef}
+              width="fit"
+              height="fit"
+              centered
+              className="bg-transparent mt-12 opacity-0"
+            >
               <button
                 onClick={openHomepageTab}
                 className="px-20 py-5 text-lg bg-transparent hover:scale-110 border-2 hover:bg-white hover:text-black transition duration-300 ease-in-out text-white rounded-full"
               >
                 START LISTENING
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Section>
+          </Container>
+        </Flex>
+      </Container>
+    </Container>
   );
 }
