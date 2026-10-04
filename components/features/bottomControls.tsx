@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
 import RangeInput from "@/components/ui/rangeInput";
+import IconButton from "@/components/ui/iconButton";
 
 registerGSAP();
 
@@ -136,32 +137,23 @@ export const BottomControls = ({
         >
           <div className="h-full w-full flex justify-center items-center">
             <div className="transition-transform duration-200 ease-in-out hover:scale-110 active:scale-[0.8]">
-              <button
+              <IconButton
+                size="lg"
                 onClick={playMusic}
-                className="h-16 w-16 lg:h-20 lg:w-20 text-lg bg-transparent border-2 transition duration-300 ease-in-out text-white rounded-full"
-              >
-                <img
-                  className="h-12 w-12 mx-auto"
-                  src={play ? "/image/icon/pause.svg" : "/image/icon/play.svg"}
-                  alt="PlayIcon"
-                />
-              </button>
+                src={play ? "/image/icon/pause.svg" : "/image/icon/play.svg"}
+                alt="PlayIcon"
+              />
             </div>
             <div className="transition-transform duration-200 ease-in-out hover:scale-110 active:scale-[0.8]">
-              <button
+              <IconButton
+                size="lg"
                 onClick={changeMute}
-                className="h-16 w-16 lg:h-20 lg:w-20 mx-6 lg:mx-5 text-lg bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full"
-              >
-                <img
-                  className="h-12 w-12 mx-auto"
-                  src={
-                    mute
-                      ? "/image/icon/volumeoff.svg"
-                      : "/image/icon/volumeon.svg"
-                  }
-                  alt="VolumeIcon"
-                />
-              </button>
+                src={
+                  mute ? "/image/icon/volumeoff.svg" : "/image/icon/volumeon.svg"
+                }
+                alt="VolumeIcon"
+                className="mx-6 lg:mx-5 hover:scale-110"
+              />
             </div>
             <RangeInput
               onChange={handleChangeVolume}

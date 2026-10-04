@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
+import IconButton from "@/components/ui/iconButton";
 
 registerGSAP();
 
@@ -36,13 +37,11 @@ const TopNavigation = ({ ...others }) => {
     >
       <div className="w-full md:w-[40%] lg:w-1/3 h-full flex justify-start items-center">
         <Link href="/">
-          <button className="h-9 w-9 mx-5 ml-0 lg:ml-20 bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
-            <img
-              className="h-6 w-6 mx-auto"
-              src="/image/icon/back.svg"
-              alt="ReturnIcon"
-            />
-          </button>
+          <IconButton
+            src="/image/icon/back.svg"
+            alt="ReturnIcon"
+            className="mx-5 ml-0 lg:ml-20"
+          />
         </Link>
         <h2
           className="text-white text-xl lg:text-3xl"
@@ -55,13 +54,11 @@ const TopNavigation = ({ ...others }) => {
           target={"_blank"}
           rel="noreferrer"
         >
-          <button className="h-9 w-9 mx-5 text-lg bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
-            <img
-              className="h-6 w-6 mx-auto"
-              src="/image/icon/github.svg"
-              alt="GitHubIcon"
-            />
-          </button>
+          <IconButton
+            src="/image/icon/github.svg"
+            alt="GitHubIcon"
+            className="mx-5 text-lg"
+          />
         </a>
       </div>
       <div className="w-6/12 lg:w-7/12 h-full hidden md:block">
