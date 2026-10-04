@@ -194,29 +194,3 @@ export const BottomControls = ({
     </div>
   );
 };
-
-type BottomControlsMobileProps = {
-  handleVolume: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  icon: string;
-};
-
-export const BottomControlsMobile = ({
-  handleVolume,
-  icon,
-}: BottomControlsMobileProps) => {
-  return (
-    <div className="h-14 w-full relative md:hidden">
-      <div className="h-full w-full flex justify-end items-center ">
-        <div className="h-fit w-fit md:-rotate-90 float-right">
-          <RangeInput
-            onChange={handleVolume}
-            className="w-[6rem] md:w-[10rem] mr-5 md:mr-0"
-          />
-        </div>
-        <div className="h-fit w-fit text-white text-center float-right absolute right-[8rem] md:right-[6rem]">
-          <img className="w-8 h-8" src={icon} alt="BrightnessIcon"></img>
-        </div>
-      </div>
-    </div>
-  );
-};

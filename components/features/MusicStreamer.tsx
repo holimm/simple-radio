@@ -8,16 +8,10 @@ import VideoPlayer from "@/components/features/videoPlayer";
 import TopNavigation from "@/components/features/topNav";
 import ChannelPicker from "@/components/features/channelPicker";
 import PausedScreen from "@/components/features/pausedScreen";
-import BrightnessChanger from "@/components/features/brightnessChanger";
 import NatureSound from "@/components/features/natureSound";
-import {
-  BackgroundVideo,
-  BackgroundControlsMobile,
-} from "@/components/features/backgroundVideo";
-import {
-  BottomControls,
-  BottomControlsMobile,
-} from "@/components/features/bottomControls";
+import { BackgroundVideo } from "@/components/features/backgroundVideo";
+import { BottomControls } from "@/components/features/bottomControls";
+import IconRangeControl from "@/components/ui/iconRangeControl";
 import { BackgroundPlayerModel, ChannelModel } from "@/models/mainModel";
 import useWindowDimensions from "@/hooks/useDimensions";
 
@@ -237,17 +231,24 @@ export default function MusicStreamer() {
           {!play && <PausedScreen />}
           <div ref={rightColumnRef} className="w-3/12 h-full float-right">
             <div className="w-full h-full md:flex justify-end items-center relative">
-              <BrightnessChanger handleBrightness={handleBrightness} />
-              <BottomControlsMobile
-                handleVolume={handleRainVolume}
+              <IconRangeControl
+                onChange={handleBrightness}
+                icon="/image/icon/brightness.svg"
+              />
+              <IconRangeControl
+                hiddenOnMd
+                onChange={handleRainVolume}
                 icon="/image/icon/rain.svg"
               />
-              <BottomControlsMobile
-                handleVolume={handleWaveVolume}
+              <IconRangeControl
+                hiddenOnMd
+                onChange={handleWaveVolume}
                 icon="/image/icon/wave.svg"
               />
-              <BackgroundControlsMobile
-                handleVolume={handleBackgroundChange}
+              <IconRangeControl
+                hiddenOnMd
+                max={4}
+                onChange={handleBackgroundChange}
                 icon="/image/icon/image.svg"
               />
             </div>
