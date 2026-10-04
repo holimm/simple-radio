@@ -4,20 +4,20 @@ import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
 import Particle from "@/particles/particles";
-import VideoPlayer from "@/components/videoPlayer";
-import TopNavigation from "@/components/topNav";
-import ChannelPicker from "@/components/channelPicker";
-import PausedScreen from "@/components/pausedScreen";
-import BrightnessChanger from "@/components/brightnessChanger";
-import NatureSound from "@/components/natureSound";
+import VideoPlayer from "@/components/features/videoPlayer";
+import TopNavigation from "@/components/features/topNav";
+import ChannelPicker from "@/components/features/channelPicker";
+import PausedScreen from "@/components/features/pausedScreen";
+import BrightnessChanger from "@/components/features/brightnessChanger";
+import NatureSound from "@/components/features/natureSound";
 import {
   BackgroundVideo,
   BackgroundControlsMobile,
-} from "@/components/backgroundVideo";
+} from "@/components/features/backgroundVideo";
 import {
   BottomControls,
   BottomControlsMobile,
-} from "@/components/bottomControls";
+} from "@/components/features/bottomControls";
 import { BackgroundPlayerModel, ChannelModel } from "@/models/mainModel";
 import useWindowDimensions from "@/hooks/useDimensions";
 

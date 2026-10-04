@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ReactPlayer from "react-player";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
-import NatureSound from "@/components/natureSound";
+import NatureSound from "@/components/features/natureSound";
 
 registerGSAP();
 
