@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
 import listRadio from "@/radioList.json";
 import { ChannelModel } from "@/models/mainModel";
+import RangeInput from "@/components/ui/rangeInput";
 
 registerGSAP();
 
@@ -53,14 +54,7 @@ const ChannelPicker = ({
           >
             {genre}
           </p>
-          <input
-            type={"range"}
-            onChange={handleGenreChange}
-            className="appearance-none rounded-xl p-0 h-1 bg-slate-100"
-            min={0}
-            max={4}
-            defaultValue={0}
-          />
+          <RangeInput onChange={handleGenreChange} max={4} />
         </div>
       </div>
       <div className="w-full h-3/4 mt-0 md:mt-3 float-right overflow-w-0 overflow-x-hidden">

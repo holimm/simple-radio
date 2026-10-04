@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import ReactPlayer from "react-player";
+import RangeInput from "@/components/ui/rangeInput";
 
 type BackgroundVideoProps = {
   height: string;
@@ -59,13 +60,10 @@ export const BackgroundControlsMobile = ({
     <div className="h-14 w-full relative md:hidden">
       <div className="h-full w-full flex justify-end items-center ">
         <div className="h-fit w-fit md:-rotate-90 float-right">
-          <input
-            type={"range"}
+          <RangeInput
             onChange={handleVolume}
-            className="appearance-none rounded-xl p-0 h-1 bg-slate-100 w-[6rem] md:w-[10rem] mr-5 md:mr-0"
-            min={0}
             max={4}
-            defaultValue={0}
+            className="w-[6rem] md:w-[10rem] mr-5 md:mr-0"
           />
         </div>
         <div className="h-fit w-fit text-white text-center float-right absolute right-[8rem] md:right-[6rem]">

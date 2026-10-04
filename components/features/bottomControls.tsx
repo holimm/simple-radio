@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/gsap";
+import RangeInput from "@/components/ui/rangeInput";
 
 registerGSAP();
 
@@ -92,13 +93,9 @@ export const BottomControls = ({
         }`}
       >
         <img className={`w-8 h-8 mr-5 xl:mx-auto`} src={src} alt={alt}></img>
-        <input
-          type={"range"}
+        <RangeInput
           onChange={handleVolume}
-          className="w-[2rem] md:w-[8rem] appearance-none rounded-xl p-0 h-1 bg-slate-100"
-          min={0}
-          max={100}
-          defaultValue={0}
+          className="w-[2rem] md:w-[8rem]"
         />
       </div>
     );
@@ -166,13 +163,9 @@ export const BottomControls = ({
                 />
               </button>
             </div>
-            <input
-              type={"range"}
+            <RangeInput
               onChange={handleChangeVolume}
-              className={`w-[7rem] md:w-[5rem] lg:w-[7rem] xl:w-[8rem] appearance-none rounded-xl p-0 h-1 ml-1 md:ml-0 bg-slate-100`}
-              min={0}
-              max={100}
-              defaultValue={0}
+              className="w-[7rem] md:w-[5rem] lg:w-[7rem] xl:w-[8rem] ml-1 md:ml-0"
             />
           </div>
         </div>
@@ -192,14 +185,7 @@ export const BottomControls = ({
               >
                 {backgroundLabel}
               </p>
-              <input
-                type={"range"}
-                onChange={handleBackgroundChange}
-                className="appearance-none rounded-xl p-0 h-1 bg-slate-100"
-                min={0}
-                max={4}
-                defaultValue={0}
-              />
+              <RangeInput onChange={handleBackgroundChange} max={4} />
             </div>
           </div>
         </div>
@@ -222,13 +208,9 @@ export const BottomControlsMobile = ({
     <div className="h-14 w-full relative md:hidden">
       <div className="h-full w-full flex justify-end items-center ">
         <div className="h-fit w-fit md:-rotate-90 float-right">
-          <input
-            type={"range"}
+          <RangeInput
             onChange={handleVolume}
-            className="appearance-none rounded-xl p-0 h-1 bg-slate-100 w-[6rem] md:w-[10rem] mr-5 md:mr-0"
-            min={0}
-            max={100}
-            defaultValue={0}
+            className="w-[6rem] md:w-[10rem] mr-5 md:mr-0"
           />
         </div>
         <div className="h-fit w-fit text-white text-center float-right absolute right-[8rem] md:right-[6rem]">
