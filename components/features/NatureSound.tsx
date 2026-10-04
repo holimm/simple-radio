@@ -11,19 +11,19 @@ type NatureSoundProps = {
 
 const NatureSound = ({ volume, mute, play, url }: NatureSoundProps) => {
   return (
-    <>
+    <div className="player-nature" aria-hidden="true">
       <ReactPlayer
-        className="react-player !opacity-0"
+        className="react-player"
         src={`https://www.youtube.com/watch?v=${url}`}
-        width={"100%"}
-        height={"100vh"}
+        width="100%"
+        height="100%"
         controls={false}
         playing={play}
         loop={true}
         volume={volume}
         muted={mute}
       />
-    </>
+    </div>
   );
 };
 

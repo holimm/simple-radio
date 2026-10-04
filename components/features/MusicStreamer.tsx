@@ -1,306 +1,270 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactElement } from "react";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGSAP } from "@/lib/Gsap";
+import {
+  consumePageTransition,
+  markPageTransition,
+} from "@/lib/pageTransition";
 import Particles from "@/components/ui/Particles";
 import VideoPlayer from "@/components/features/VideoPlayer";
 import TopNavigation from "@/components/features/TopNav";
-import ChannelPicker from "@/components/features/ChannelPicker";
-import PausedScreen from "@/components/features/PausedScreen";
 import NatureSound from "@/components/features/NatureSound";
-import { BackgroundVideo } from "@/components/features/BackgroundVideo";
-import { BottomControls } from "@/components/features/BottomControls";
-import IconRangeControl from "@/components/ui/IconRangeControl";
-import Container from "@/components/layout/Container";
-import Section from "@/components/layout/Section";
-import { BackgroundPlayerModel, ChannelModel } from "@/models/MainModel";
-import useWindowDimensions from "@/hooks/useDimensions";
+import ChannelMarquee from "@/components/features/player/ChannelMarquee";
+import StationList from "@/components/features/player/StationList";
+import ControlDock from "@/components/features/player/ControlDock";
+import type { ChannelModel } from "@/models/MainModel";
+import useParticleField from "@/hooks/useParticleField";
+import listRadio from "@/RadioList.json";
 
 registerGSAP();
 
+const CHANNELS = listRadio as ChannelModel[];
+
+const DEFAULT_CHANNEL: ChannelModel = CHANNELS[0] ?? {
+  channel: "Lofi Girl – Relax/Study",
+  urlPart: "rFZHOHl-L8A",
+  url: "https://www.youtube.com/watch?v=rFZHOHl-L8A",
+};
+
 export default function MusicStreamer() {
+  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   const curtainRef = useRef<HTMLDivElement>(null);
-  const particlesWrapRef = useRef<HTMLDivElement>(null);
-  const rightColumnRef = useRef<HTMLDivElement>(null);
-  const [mute, setMute] = useState<boolean>(true);
-  const [play, setPlay] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(0);
-  const [playRain, setPlayRain] = useState<boolean>(false);
-  const [volumeRain, setVolumeRain] = useState<number>(0);
-  const [playWave, setPlayWave] = useState<boolean>(false);
-  const [volumeWave, setVolumeWave] = useState<number>(0);
-  const [brightness, setBrightness] = useState<number>(0);
-  const [genre, setGenre] = useState<string>("Streaming");
-  const [bgPlayer, setBGPlayer] = useState<BackgroundPlayerModel>({
-    label: "BG Video",
-    url: "",
-  });
-  const [particles] = useState(<Particles />);
-  const [channel, setChannel] = useState<ChannelModel>({
-    channel: "Lofi Girl - Relax/Study",
-    urlPart: "jfKfPfyJRdk",
-    url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
-    type: "Streaming",
-  });
-  const { width } = useWindowDimensions();
+  const uiRef = useRef<HTMLDivElement>(null);
+  const musicRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const channelRef = useRef(DEFAULT_CHANNEL);
+  const switchToken = useRef(0);
+  const leavingRef = useRef(false);
+  const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(false);
+  const [volume, setVolume] = useState(0);
+  const [rain, setRain] = useState(0);
+  const [waves, setWaves] = useState(0);
+  const [brightness, setBrightness] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+  const [fromHome, setFromHome] = useState<boolean | null>(null);
+  const [channel, setChannel] = useState<ChannelModel>(DEFAULT_CHANNEL);
+  const [particles] = useState<ReactElement>(() => <Particles />);
+  const particlesOn = useParticleField();
+
+  useLayoutEffect(() => {
+    const handoff = consumePageTransition("player");
+    setFromHome(handoff);
+    if (handoff) {
+      gsap.set(curtainRef.current, { autoAlpha: 1 });
+      gsap.set(uiRef.current, { autoAlpha: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    router.prefetch("/");
+  }, [router]);
 
   useGSAP(
     () => {
+      if (fromHome === null) return;
+
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(curtainRef.current, { y: "100vh", display: "none" });
-        gsap.set(rightColumnRef.current, { x: 0 });
+        gsap.set(curtainRef.current, { autoAlpha: 0 });
+        gsap.set(uiRef.current, { autoAlpha: 1, y: 0 });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const enter = gsap.timeline();
-        enter.fromTo(
+        gsap.set(curtainRef.current, { autoAlpha: 1, yPercent: 0 });
+        gsap.set(uiRef.current, { autoAlpha: 0, y: fromHome ? 18 : 12 });
+
+        const enter = gsap.timeline({ defaults: { ease: "power2.out" } });
+        enter.to(
           curtainRef.current,
-          { y: 0, display: "block" },
           {
-            y: "100vh",
-            duration: 1,
-            delay: 0.5,
-            ease: "power1.inOut",
-            onComplete: () => {
-              gsap.set(curtainRef.current, { display: "none" });
-            },
+            autoAlpha: 0,
+            duration: fromHome ? 0.75 : 0.9,
+            delay: fromHome ? 0 : 0.12,
           },
           0
         );
-        enter.fromTo(
-          rightColumnRef.current,
-          { x: 150 },
-          { x: 0, duration: 1.7, delay: 0.8, ease: "power1.inOut" },
-          0
+        enter.to(
+          uiRef.current,
+          { autoAlpha: 1, y: 0, duration: fromHome ? 0.7 : 0.8 },
+          fromHome ? 0.18 : 0.28
         );
       });
     },
-    { scope: rootRef }
+    { dependencies: [fromHome], scope: rootRef }
   );
+
+  useEffect(() => {
+    channelRef.current = channel;
+  }, [channel]);
+
+  const selectChannel = (next: ChannelModel) => {
+    if (next.urlPart === channelRef.current.urlPart) return;
+
+    const token = ++switchToken.current;
+    const nodes = [titleRef.current, playing ? musicRef.current : null].filter(
+      (node): node is HTMLParagraphElement | HTMLDivElement => node !== null
+    );
+    const apply = () => {
+      if (switchToken.current !== token) return;
+      channelRef.current = next;
+      setChannel(next);
+    };
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduce || nodes.length === 0) {
+      gsap.set(nodes, { opacity: 1 });
+      apply();
+      return;
+    }
+
+    gsap.killTweensOf(nodes);
+    gsap.to(nodes, {
+      opacity: 0,
+      duration: 0.35,
+      ease: "power1.inOut",
+      onComplete: () => {
+        apply();
+        if (switchToken.current !== token) return;
+        gsap.to(nodes, { opacity: 1, duration: 0.45, ease: "power1.inOut" });
+      },
+    });
+  };
+
+  const stepChannel = (direction: -1 | 1) => {
+    if (CHANNELS.length === 0) return;
+    const currentIndex = CHANNELS.findIndex(
+      (item) => item.urlPart === channelRef.current.urlPart
+    );
+    const index = currentIndex < 0 ? 0 : currentIndex;
+    const nextIndex = (index + direction + CHANNELS.length) % CHANNELS.length;
+    selectChannel(CHANNELS[nextIndex]);
+  };
+
+  const toggleMute = () => {
+    if (muted) {
+      setMuted(false);
+      if (volume === 0) setVolume(0.5);
+      return;
+    }
+    setMuted(true);
+  };
+
+  const goHome = () => {
+    if (leavingRef.current) return;
+    leavingRef.current = true;
+    setLeaving(true);
+  };
 
   useGSAP(
     () => {
-      if (play || !particlesWrapRef.current) return;
+      if (!leaving || !curtainRef.current) return;
 
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(particlesWrapRef.current, { opacity: 1 });
+        markPageTransition("home");
+        gsap.set(curtainRef.current, { autoAlpha: 1 });
+        router.push("/");
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.fromTo(
-          particlesWrapRef.current,
-          { opacity: 0 },
-          { opacity: 1, duration: 1, ease: "power1.inOut" }
+        markPageTransition("home");
+        router.prefetch("/");
+
+        const leave = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          onComplete: () => {
+            router.push("/");
+          },
+        });
+
+        leave.to(
+          uiRef.current,
+          { autoAlpha: 0, y: -14, duration: 0.4, ease: "power2.in" },
+          0
         );
+        leave.to(curtainRef.current, { autoAlpha: 1, duration: 0.55 }, 0.12);
       });
     },
-    { dependencies: [play], scope: rootRef }
+    { dependencies: [leaving, router], scope: rootRef }
   );
 
-  const changeMute = () => {
-    setMute(!mute);
-  };
-  const playMusic = () => {
-    setPlay(!play);
-  };
-  const handleChangeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextVolume = Number(e.target.value) / 100;
-    if (nextVolume !== 0) {
-      setVolume(nextVolume);
-      setMute(false);
-    } else {
-      setVolume(nextVolume);
-      setMute(true);
-    }
-  };
-  const handleRainVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextVolume = Number(e.target.value) / 100;
-    setPlayRain(nextVolume !== 0);
-    setVolumeRain(nextVolume);
-  };
-  const handleWaveVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextVolume = Number(e.target.value) / 100;
-    setPlayWave(nextVolume !== 0);
-    setVolumeWave(nextVolume);
-  };
-  const handleBrightness = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextBrightness = Number(e.target.value) / 100;
-    setBrightness(nextBrightness);
-  };
-  const handleGenreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (value === 0) setGenre("Streaming");
-    else if (value === 1) setGenre("Lofi");
-    else if (value === 2) setGenre("Piano");
-    else if (value === 3) setGenre("Electric Guitar");
-    else if (value === 4) setGenre("Creator's Choice");
-    else setGenre("Streaming");
-  };
-  const handleBackgroundChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    switch (e.target.value) {
-      case "0": {
-        setBGPlayer({ label: "Video BG", url: "" });
-        break;
-      }
-      case "1": {
-        setBGPlayer({ label: "Autumn", url: "2wIACHP04qQ" });
-        break;
-      }
-      case "2": {
-        setBGPlayer({ label: "Summer Tram", url: "KextmYQmxH0" });
-        break;
-      }
-      case "3": {
-        setBGPlayer({ label: "Rain", url: "kDCXBwzSI-4" });
-        break;
-      }
-      case "4": {
-        setBGPlayer({ label: "Living Room", url: "zJOQRLJyQYA" });
-        break;
-      }
-    }
-  };
-  function changeChannel(nextChannel: ChannelModel) {
-    setChannel(nextChannel);
-  }
-
   return (
-    <Container ref={rootRef}>
-      <div
-        ref={curtainRef}
-        className="h-screen w-screen bg-black absolute z-50"
-      ></div>
-      {width < 768 && (
-        <div className="h-[50vh] w-screen bg-black absolute bottom-0 z-20"></div>
-      )}
-      <NatureSound
-        volume={volumeRain}
-        mute={mute}
-        play={playRain}
-        url="Q48Fry14PDM"
-      />
-      <NatureSound
-        volume={volumeWave}
-        mute={mute}
-        play={playWave}
-        url="nZfnoaHqFZw"
-      />
-      <Container
-        width="full"
-        height="full"
-        overflow="hidden"
-        position="absolute"
-        className="top-0 z-10 md:scale-[1.8] scale-[1.4]"
-      >
-        <VideoPlayer
-          className={"react-player"}
-          height={width < 768 ? "50vh" : "100vh"}
-          width={"100%"}
-          playing={play}
-          volume={volume}
-          muted={mute}
-          urlPart={channel.urlPart}
+    <div ref={rootRef} className="player-root">
+      <div ref={curtainRef} className="player-curtain" />
+      <div className="player-media" inert>
+        <div ref={musicRef} className="player-music">
+          <VideoPlayer
+            className="react-player"
+            height="100%"
+            width="100%"
+            playing={playing}
+            volume={volume}
+            muted={muted}
+            urlPart={channel.urlPart}
+          />
+        </div>
+        <NatureSound
+          volume={rain}
+          mute={muted}
+          play={rain > 0}
+          url="Q48Fry14PDM"
         />
-      </Container>
-
-      <BackgroundVideo
-        height={width < 768 ? "50vh" : "100vh"}
-        width={"100%"}
-        play={play}
-        backgroundURL={bgPlayer.url}
-        screen
-      />
-
-      <div
-        className={`h-full w-full overflow-hidden absolute top-0 z-10 bg-black`}
-        style={{ opacity: brightness }}
-      ></div>
-
-      {!play && (
-        <Container
-          ref={particlesWrapRef}
-          position="absolute"
-          className="top-0 z-30 opacity-0"
+        <NatureSound
+          volume={waves}
+          mute={muted}
+          play={waves > 0}
+          url="nZfnoaHqFZw"
+        />
+      </div>
+      <div className="player-brightness" style={{ opacity: brightness }} />
+      <div className="player-scrim" />
+      {particlesOn && (
+        <div
+          className="player-particles"
+          aria-hidden="true"
+          style={{ opacity: playing ? 0 : 1, visibility: playing ? "hidden" : "visible" }}
         >
           {particles}
-        </Container>
+        </div>
       )}
-      <Container
-        width="screen"
-        height="screen"
-        overflow="hidden"
-        position="absolute"
-        className="bg-transparent top-0 z-30"
-      >
-        <TopNavigation channel={channel.channel} url={channel.url} />
-        <Section
-          width="full"
-          display="block"
-          className="h-[27vh] md:hidden"
+      <div ref={uiRef} className="player-ui">
+        <TopNavigation
+          ref={titleRef}
+          channel={channel.channel}
+          channelUrl={channel.url}
+          onBack={goHome}
         />
-        <Section width="full" className="h-[29vh] md:h-[70%]">
-          <ChannelPicker
-            genre={genre}
-            handleGenreChange={handleGenreChange}
-            changeChannel={changeChannel}
-          />
-          {!play && <PausedScreen />}
-          <Container
-            ref={rightColumnRef}
-            width="3/12"
-            height="full"
-            className="float-right"
-          >
-            <Container
-              width="full"
-              height="full"
-              position="relative"
-              className="md:flex justify-end items-center"
-            >
-              <IconRangeControl
-                onChange={handleBrightness}
-                icon="/image/icon/brightness.svg"
-              />
-              <IconRangeControl
-                hiddenOnMd
-                onChange={handleRainVolume}
-                icon="/image/icon/rain.svg"
-              />
-              <IconRangeControl
-                hiddenOnMd
-                onChange={handleWaveVolume}
-                icon="/image/icon/wave.svg"
-              />
-              <IconRangeControl
-                hiddenOnMd
-                max={4}
-                onChange={handleBackgroundChange}
-                icon="/image/icon/image.svg"
-              />
-            </Container>
-          </Container>
-        </Section>
-        <Section width="full" height="full" className="p-5 pb-10 mt-8 md:mt-0">
-          <BottomControls
-            handleChangeVolume={handleChangeVolume}
-            handleRainVolume={handleRainVolume}
-            handleWaveVolume={handleWaveVolume}
-            handleBackgroundChange={handleBackgroundChange}
-            changeMute={changeMute}
-            playMusic={playMusic}
-            play={play}
-            mute={mute}
-            backgroundLabel={bgPlayer.label}
-            screenWidth={width}
-          />
-        </Section>
-      </Container>
-    </Container>
+        <div className="player-center">
+          <ChannelMarquee playing={playing} />
+        </div>
+        <StationList currentUrlPart={channel.urlPart} onSelect={selectChannel} />
+        <ControlDock
+          playing={playing}
+          muted={muted}
+          volume={volume}
+          rain={rain}
+          waves={waves}
+          brightness={brightness}
+          onPrevious={() => stepChannel(-1)}
+          onNext={() => stepChannel(1)}
+          onTogglePlay={() => setPlaying((next) => !next)}
+          onToggleMute={toggleMute}
+          onVolume={(next) => {
+            setVolume(next);
+            setMuted(next === 0);
+          }}
+          onRain={setRain}
+          onWaves={setWaves}
+          onBrightness={setBrightness}
+        />
+      </div>
+    </div>
   );
 }

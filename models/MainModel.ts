@@ -7,5 +7,4 @@ export interface ChannelModel {
   channel: string;
   urlPart: string;
   url: string;
-  type: string;
 }

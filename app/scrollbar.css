@@ -11,6 +11,7 @@
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #ffffff;
+  transition: background-color 180ms ease;
 }
 
 /* Handle on hover */
