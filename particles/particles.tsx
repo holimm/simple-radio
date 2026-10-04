@@ -1,24 +1,14 @@
-import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
+"use client";
 
-export default function Particle() {
-  const particlesInit = async (main) => {
-    console.log(main);
+import { useCallback } from "react";
+import Particles, { ParticlesProvider } from "@tsparticles/react";
+import type { Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 
-    // you can initialize the tsParticles instance (main) here, adding custom shapes or presets
-    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-    // starting from v2 you can add only the features you need reducing the bundle size
-    await loadFull(main);
-  };
-
-  const particlesLoaded = (container) => {
-    console.log(container);
-  };
+function ParticleCanvas() {
   return (
     <Particles
       id="tsparticles"
-      init={particlesInit}
-      loaded={particlesLoaded}
       options={{
         fpsLimit: 60,
         particles: {
@@ -38,7 +28,6 @@ export default function Particle() {
           number: {
             density: {
               enable: true,
-              area: 800,
             },
             value: 80,
           },
@@ -49,11 +38,23 @@ export default function Particle() {
             type: "circle",
           },
           size: {
-            value: { min: 1, max: 5},
+            value: { min: 1, max: 5 },
           },
         },
         detectRetina: true,
       }}
     />
   );
-};
+}
+
+export default function Particle() {
+  const init = useCallback(async (engine: Engine) => {
+    await loadSlim(engine);
+  }, []);
+
+  return (
+    <ParticlesProvider init={init}>
+      <ParticleCanvas />
+    </ParticlesProvider>
+  );
+}

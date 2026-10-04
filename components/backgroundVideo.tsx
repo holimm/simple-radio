@@ -1,13 +1,27 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import ReactPlayer from "react-player";
 
-export const BackgroundVideo = ({ ...others }) => {
-  console.log(others.backgroundURL);
+type BackgroundVideoProps = {
+  height: string;
+  width: string;
+  play: boolean;
+  backgroundURL: string;
+  screen?: boolean;
+};
+
+export const BackgroundVideo = ({
+  height,
+  width,
+  play,
+  backgroundURL,
+}: BackgroundVideoProps) => {
   const refBackground = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     refBackground.current?.classList.remove("hidden");
-  }, [others.backgroundURL]);
+  }, [backgroundURL]);
 
   return (
     <div
@@ -16,11 +30,15 @@ export const BackgroundVideo = ({ ...others }) => {
     >
       <ReactPlayer
         className="react-player"
-        url={`//www.youtube.com/embed/${others.backgroundURL}?autoplay=1&mute=0&start=0`}
-        width={others.width}
-        height={others.height}
+        src={
+          backgroundURL
+            ? `https://www.youtube.com/watch?v=${backgroundURL}`
+            : undefined
+        }
+        width={width}
+        height={height}
         controls={false}
-        playing={others.play}
+        playing={play}
         loop={true}
         muted={true}
       />
@@ -28,14 +46,22 @@ export const BackgroundVideo = ({ ...others }) => {
   );
 };
 
-export const BackgroundControlsMobile = ({ ...others }) => {
+type BackgroundControlsMobileProps = {
+  handleVolume: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  icon: string;
+};
+
+export const BackgroundControlsMobile = ({
+  handleVolume,
+  icon,
+}: BackgroundControlsMobileProps) => {
   return (
     <div className="h-14 w-full relative md:hidden">
       <div className="h-full w-full flex justify-end items-center ">
         <div className="h-fit w-fit md:-rotate-90 float-right">
           <input
             type={"range"}
-            onChange={others.handleVolume}
+            onChange={handleVolume}
             className="appearance-none rounded-xl p-0 h-1 bg-slate-100 w-[6rem] md:w-[10rem] mr-5 md:mr-0"
             min={0}
             max={4}
@@ -43,7 +69,7 @@ export const BackgroundControlsMobile = ({ ...others }) => {
           />
         </div>
         <div className="h-fit w-fit text-white text-center float-right absolute right-[8rem] md:right-[6rem]">
-          <img className="w-8 h-8" src={others.icon} alt="BrightnessIcon"></img>
+          <img className="w-8 h-8" src={icon} alt="BrightnessIcon"></img>
         </div>
       </div>
     </div>

@@ -1,21 +1,47 @@
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import BackIcon from "../image/icon/back.svg";
-import GithubIcon from "../image/icon/github.svg";
-import YoutubeIcon from "../image/icon/youtube.svg";
+"use client";
+
+import { useRef } from "react";
+import Link from "next/link";
+import { useGSAP } from "@gsap/react";
+import { gsap, registerGSAP } from "@/lib/gsap";
+
+registerGSAP();
 
 const TopNavigation = ({ ...others }) => {
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(navRef.current, { opacity: 1 });
+      });
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.fromTo(
+          navRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 3, ease: "power1.inOut" }
+        );
+      });
+    },
+    { scope: navRef }
+  );
+
   return (
-    <motion.div
-      className="h-20 w-full flex justify-start items-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 3, ease: "easeInOut" }}
+    <div
+      ref={navRef}
+      className="h-20 w-full flex justify-start items-center opacity-0"
     >
       <div className="w-full md:w-[40%] lg:w-1/3 h-full flex justify-start items-center">
-        <Link to="/MySimpleRadio/">
+        <Link href="/">
           <button className="h-9 w-9 mx-5 ml-0 lg:ml-20 bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
-            <img className="h-6 w-6 mx-auto" src={BackIcon} alt="ReturnIcon" />
+            <img
+              className="h-6 w-6 mx-auto"
+              src="/image/icon/back.svg"
+              alt="ReturnIcon"
+            />
           </button>
         </Link>
         <h2
@@ -32,7 +58,7 @@ const TopNavigation = ({ ...others }) => {
           <button className="h-9 w-9 mx-5 text-lg bg-transparent border-2 hover:scale-110 transition duration-300 ease-in-out text-white rounded-full">
             <img
               className="h-6 w-6 mx-auto"
-              src={GithubIcon}
+              src="/image/icon/github.svg"
               alt="GitHubIcon"
             />
           </button>
@@ -49,13 +75,13 @@ const TopNavigation = ({ ...others }) => {
           <a href={`${others.url}`} target={"_blank"} rel="noreferrer">
             <img
               className="w-10 h-10 ml-4 mt-2 hover:scale-110 transition duration-300 ease-in-out cursor-pointer"
-              src={YoutubeIcon}
+              src="/image/icon/youtube.svg"
               alt="YoutubeIcon"
             ></img>
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
