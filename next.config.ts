@@ -5,12 +5,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/MySimpleRadio",
+        source: "/SimpleRadio",
         destination: "/",
         permanent: true,
       },
       {
-        source: "/MySimpleRadio/MusicStreamer",
+        source: "/SimpleRadio/MusicStreamer",
         destination: "/MusicStreamer",
         permanent: true,
       },

@@ -10,9 +10,9 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "My Simple Radio 🎵🎵",
+  title: "Simple Radio 🎵🎵",
   description:
-    "MySimpleRadio is a simple music player that streams from Youtube. Whether you are studying, playing games, or just relaxing.",
+    "SimpleRadio is a simple music player that streams from Youtube. Whether you are studying, playing games, or just relaxing.",
   icons: {
     icon: "/image/headphone.svg",
   },

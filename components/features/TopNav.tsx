@@ -46,10 +46,10 @@ const TopNavigation = forwardRef<HTMLParagraphElement, TopNavigationProps>(
           >
             <img src="/image/icon/back.svg" alt="" />
           </button>
-          <h1 className="player-wordmark">My Simple Radio</h1>
+          <h1 className="player-wordmark">Simple Radio</h1>
           <a
             className="player-icon-link"
-            href="https://github.com/holimm/MySimpleRadio"
+            href="https://github.com/holimm/SimpleRadio"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub repository"
